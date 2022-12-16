@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <title>Installation and Example Runs</title>
+    <link rel="stylesheet" type="text/css" href="all-slides.css" />
+    <link rel="stylesheet" type="text/css" href="green-slides.css" />
+  </head>
+  <body>
+    <div id="top">
+      <div id="top-title">
+        Installation and Example Runs
+      </div>
+    </div>
+
+    <table cellspacing="0" cellpadding="0" id="mainTable">
+      <tr>
+        <td id="left">
+          <a href="#installation">Installation...</a><br />
+          <a href="#scheduler">Second&nbsp;Example</a><br />
+          <a href="index.html">Lurch</a><br />
+          <a href="https://home.messiah.edu/~owen/">Home</a><br />
+        </td>
+        <td id="main" colspan="2">
+          <div class="post">
+            <a name="installation"></a>
+              <div class="post-title">
+                Installation and Example
+              </div>
+            <div class="post-body">
+              <div>
+                To install, unzip the download file,
+                go to the new lurch directory, and compile 2lu.c:
+<pre>
+$ flex -o2lu.c 2lu.lex
+$ gcc -o 2lu 2lu.c
+</pre>
+                From the directory in which Lurch is installed, run 2lu on the input
+                file to create the executable <tt>lurch</tt> (a unique executable is
+                created for each input file).  Then run Lurch.
+                Here the input file is a model representing Dekker's
+                solution to the two-process mutual exclusion problem.
+                (This model comes from page 96 of Gerard Holzmann's book
+                <a href="http://spinroot.com/spin/Doc/popd.html"><i>Design
+                  and Validation of Computer Protocols</i></a>.)
+<pre>
+$ ./2lu models/mutual_exclusion_error
+$ ./lurch
+</pre>
+                Lurch's output should look something like this:
+<pre>
+random seed: 1083095544
+
+time  memory  states  sts/sec  % new  col  depth
+
+0.03   1.60  8.0e+00  2.7e+02   75.0    0      4  _error
+
+writing ce/_error (281)
+
+0.20    1.73  1.0e+01  5.0e+01 (totals)
+</pre>
+                After 0.03 seconds, Lurch found the state in the model called <tt>_error</tt>.
+                In this case the model contains finite-state
+                machines representing two processes.  Each process has a
+                <i>critical section</i> in which it would, for example, access a
+                shared resource.  A third finite-state machine in the model
+                implements an assertion statement, 
+                monitoring the other two and moving to an error state
+                (called <tt>_error</tt>) if both of the other machines are in their
+                critical sections at the same time.
+
+                <br /><br />
+                At a search
+                depth of 4 global states, Lurch
+                found the error state.  1.6 megabytes of memory had been allocated
+                when the error was found, compared to 1.73 megabytes total used by
+                this run of Lurch (there is some overhead involved in generated the
+                counter example trace file).
+                Lurch tracks <i>saturation</i> (% new): 
+                when the error was found, 75 % of the global states
+                Lurch had found along that path were new, as opposed to redundant.
+                This percentage gives us a rough indicator of saturation, i.e.,
+                Lurch's transition from at first finding a great deal of new
+                information to later finding nearly all redundant information.
+                Lurch terminates automatically when the percentage drops below
+                0.01 %.
+
+                <br /><br />
+                As with a model checker, Lurch creates a counter example trace file, showing the global
+                state path from initial values to where the error state was reached.  Counter
+                example files are put in the directory <tt>ce</tt>.
+                <br /><br />
+                Now create and run an executable for the corrected version of the model:
+<pre>
+$ ./2lu models/mutual_exclusion
+$ ./lurch
+</pre>
+                No fault is detected, and no new trace file is created.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 30, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="scheduler"></a>
+              <div class="post-title">
+                Second Example
+              </div>
+            <div class="post-body">
+              <div>
+                Run Lurch for the second example,
+                a process scheduling algorithm from Gerard Holzmann's 1997
+                article, <a href="http://spinroot.com/spin/Doc/ieee97.pdf"><i>The Model Checker SPIN</i></a>.
+<pre>
+$ ./2lu models/process_scheduling_algorithm_error
+$ ./lurch -a -l -c 25
+
+random seed: 1083096019
+
+time  memory  states  sts/sec  % new  col  depth
+
+0.03   1.60  7.1e+01  2.4e+03   21.4   25    261  npcycle (2913153510)
+0.35   1.62  1.3e+02  3.7e+02    0.5   25    126  npcycle (2913153510)
+0.39   1.62  1.3e+02  3.3e+02    1.0   25     22  npcycle (2913153510)
+1.76   1.62  1.4e+02  7.9e+01    3.6    0     26
+
+writing ce/npcycle_2913153510 (29)
+
+1.95   1.73  1.4e+02  7.2e+01 (totals)
+</pre>
+                For this model Lurch is run in asynchronous mode (<tt>-a</tt>).  <tt>-l</tt>
+                tells Lurch to report no-progress cycles, or livelocks.  <tt>-c 25</tt> tells Lurch
+                to run its cycle detection function such that a cycle must be repeated 25 times
+                before it is reported.  Lurch uses a simple, informal notion of <i>fairness</i>
+                that works with randomized search:  cycles are reported when repeated a user-specified
+                number of times (to turn off fairness, use <tt>-c 1</tt>; strictly speaking, real
+                fairness would require an infinite number of repeats).
+                For a corrected version of this model, see <tt>models/process_scheduling_algorithm</tt>.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 30, 2006</em>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td id="bottom-left"></td>
+        <td id="bottom">
+          <a href="#installation">Installation...</a>
+          <a href="#scheduler">Second Example</a>
+          <a href="index.html">Lurch</a>
+          <a href="https://home.messiah.edu/~owen/">Home</a>
+        </td>
+      </tr>
+
+    </table>
+
+  </body>
+</html>

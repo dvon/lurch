@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <title>Lurch</title>
+    <link rel="stylesheet" type="text/css" href="all-slides.css" />
+    <link rel="stylesheet" type="text/css" href="green-slides.css" />
+  </head>
+  <body>
+    <div id="top">
+      <div id="top-title">
+        Lurch
+      </div>
+    </div>
+
+    <table cellspacing="0" cellpadding="0" id="mainTable">
+      <tr>
+        <td id="left">
+          <a href="#download">Download</a><br />
+          <a href="#overview">Overview</a><br />
+          <a href="#details">Details</a><br />
+          <a href="https://home.messiah.edu/~owen/">Home</a><br />
+        </td>
+        <td id="main" colspan="2">
+          <div class="post">
+            <a name="download"></a>
+              <div class="post-title">
+                Download
+              </div>
+            <div class="post-body">
+              <div>
+                <a href="lurch061907.tar.gz">lurch061907.tar.gz</a> (Original version from PhD research.)<br>
+                <a href="lurch121622.tar.gz">lurch121622.tar.gz</a> (Updated to compile without warnings in my 2022 environment.)<br />
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Friday, December 16, 2022</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="overview"></a>
+              <div class="post-title">
+                Overview
+              </div>
+            <div class="post-body">
+              <div>
+                Lurch is a tool for exploring the behavior of a finite-state
+                concurrent system.  Lurch looks for violations of the same kind
+                of properties a model checker (e.g., Gerard Holzmann's
+                <a href="http://spinroot.com/spin/whatispin.html">SPIN
+                model checker</a>) could be used to verify.
+                Unlike a model checker, however, Lurch uses a
+                partial, random search of the space of system behaviors.  The
+                search is partial because Lurch is not
+                guaranteed to explore the entire space of behaviors; the search
+                is random in that the choice of which behaviors to explore is
+                non-deterministic.
+                <br /><br />
+                Lurch generally requires much less memory than a model checker,
+                and often property violations are found faster,
+                although Lurch's speed varies from one run
+                to the next.  On the other hand, Lurch does not perform an
+                exhaustive search of the space of system behaviors, so Lurch
+                should be thought of as a supplement, not a substitute, for
+                model checking where there is enough time and memory for both.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="details"></a>
+              <div class="post-title">
+                Details
+              </div>
+            <div class="post-body">
+              <div>
+                <a href="input.html">Lurch Input Models</a><br />
+                <a href="examples.html">Basic Installation and Example Runs</a><br />
+                <a href="properties.html">Temporal Logic Properties</a><br />
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td id="bottom-left"></td>
+        <td id="bottom">
+          <a href="#download">Download</a>
+          <a href="#overview">Overview</a>
+          <a href="#details">Details</a>
+          <a href="https://home.messiah.edu/~owen/">Home</a>
+        </td>
+      </tr>
+
+    </table>
+
+  </body>
+</html>

@@ -1,0 +1,219 @@
+<html>
+  <head>
+    <title>Lurch Input Models</title>
+    <link rel="stylesheet" type="text/css" href="all-slides.css" />
+    <link rel="stylesheet" type="text/css" href="green-slides.css" />
+  </head>
+  <body>
+    <div id="top">
+      <div id="top-title">
+        Lurch Input Models
+      </div>
+    </div>
+
+    <table cellspacing="0" cellpadding="0" id="mainTable">
+      <tr>
+        <td id="left">
+          <a href="#models">Input&nbsp;Models</a><br />
+          <a href="#philosophers">Dining&nbsp;Philosophers</a><br />
+          <a href="index.html">Lurch</a><br />
+          <a href="https://home.messiah.edu/~owen/">Home</a><br />
+        </td>
+        <td id="main" colspan="2">
+          <div class="post">
+            <a name="models"></a>
+              <div class="post-title">
+                Lurch Input Models
+              </div>
+            <div class="post-body">
+              <div>
+                Lurch models begin with an optional C-code section, which is
+                followed by two percent signs (<tt>%%</tt>) and then a list of finite-state
+                machines; individual machines are separated by one or more blank
+                lines.  Each finite-state machine is a list of state declarations
+                and / or transitions.  Transitions may refer to the C-code section.
+                For example, the model below represents a simple producer-consumer
+                system:
+<pre>
+enum { P, C } turn = P;
+
+%%
+
+pr_wait; (turn == P); -;           produce;
+produce; -;           {turn = C;}; pr_wait;
+
+cs_wait; (turn == C); -;           consume;
+consume; -;           {turn = P;}; cs_wait;
+</pre>
+                The model begins with C; an enumerated type is used to declare the
+                variable <tt>turn</tt>, which has two values: <tt>P</tt> and <tt>C</tt>.
+                After the marker <tt>%%</tt> two finite-state machines are defined.
+                The first machine, which represents a producer process, has two transitions
+                (one on each line).  The first says:  when in the state <tt>pr_wait</tt>,
+                if <tt>(turn == P)</tt> evaulates to true, it is possible to go to state
+                <tt>produce</tt>.  The dash in column three indicates that this transition
+                has no output side effect.  The second transitions says: from state
+                <tt>produce</tt> it is possible to go directly to state
+                <tt>pr_wait</tt>, and if the transition occurs <tt>{turn = C;}</tt>
+                is executed as a side effect.
+                Also, the first state listed in a machine is assumed by Lurch to be the
+                initial state of the machine (<tt>pr_wait</tt> for the producer,
+                <tt>cs_wait</tt> for the consumer).
+
+                <br /><br />To avoid conflicts with the C-code part of the model, Lurch global
+                variables and function names begin with an underscore;
+                <tt>main()</tt> also can not be used in the model.  There are a few special
+                functions called by Lurch at different times during its execution, all of
+                which begin with an underscore:
+
+                <br /><br />
+                <TABLE WIDTH="100%" BORDER="0" CELLSPACING="1" CELLPADDING="5">
+                <TR><TD VALIGN="TOP" WIDTH="40%"><tt>void _before_all(void)</tt></TD><TD>
+                Called before Lurch's first attempt to find a path.
+                </TD></TR>
+                <TR><TD VALIGN="TOP"><tt>void _before(void)</tt></TD><TD>
+                Called before each of Lurch's attempts to find a path; can be used to set C variables
+                to their initial values.
+                </TD></TR>
+                <tr><td valign="top"><tt>void _before_each(void)</tt></td><td>
+                Called before each step along a path.
+                </td></tr>
+                <TR><TD VALIGN="TOP"><tt>void _score(void)</tt></TD><TD>
+                Called at the end of each time tick; can be used to modify a score value according to what
+                Lurch reaches during that time tick.
+                </TD></TR>
+                <tr><td valign="top"><tt>void _after_each(void)</tt></td><td>
+                Called after each step along a path.
+                </td></tr>
+                <TR><TD VALIGN="TOP"><tt>void _after(void)</tt></TD><TD>
+                Called after each attempt to find a path.
+                </TD></TR>
+                <TR><TD VALIGN="TOP"><tt>void _after_all(void)</tt></TD><TD>
+                Called after Lurch has finished looking for paths, or when the user hits CTRL-C to quit early.
+                </TD></TR>
+                <TR><TD VALIGN="TOP"><tt>void _hash(unsigned int *h)</tt></TD><TD>
+                Called each time Lurch calculates a hash value for a global state; can be used to include
+                C variable values in the calculation, so that two otherwise identical states with different
+                C variable values are treated as different states (<tt>*h</tt> comes in as the value of the
+                global state hash; it can be modified by this function).
+                </TD></TR>
+                <TR><TD VALIGN="TOP"><tt>void _print(char *c)</tt></TD><TD>
+                Called each time a global state is output to a counter example trace file; can be used
+                to include C variable information in the trace file.  The constant
+                <tt>_MAX_PRINT</tt> can be set to accommodate whatever length string is
+                needed for this information.
+                </TD></TR>
+                <TR><TD VALIGN="TOP"><tt>void _tr_incr(_Tran *tr)</tt></TD><TD>
+                Called after each transition processed by Lurch; can be used to track information about
+                how many times particular transitions are executed by Lurch.
+                </TD></TR>
+                </TR></TABLE>
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Monday, September 25, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="philosophers"></a>
+              <div class="post-title">
+                Dining Philosophers Example
+              </div>
+            <div class="post-body">
+              <div>
+                In the finite-state machine part of the model, machines are described by lists of 
+                mutually exclusive states and transitions.  States may be declared alone, but if they
+                are included as the start or next state of a transition they do not need to be declared
+                separately.  The model below shows two machines declared as sets of states (three each)
+                and two declared as sets of transitions, with their states implied:
+<pre>
+%%
+
+f1t.
+f1p;
+f1n;
+
+f2t.
+f2p;
+f2n;
+
+p1w; f1t; f1p;     p1l;
+p1w; f2t; f2n;     p1r;
+p1l; f2t; f2n;     p1e;
+p1r; f1t; f1p;     p1e;
+p1e; -;   f1t,f2t; p1w.
+
+p2w; f2t; f2p;     p2l;
+p2w; f1t; f1n;     p2r;
+p2l; f1t; f1n;     p2e;
+p2r; f2t; f2p;     p2e;
+p2e; -;   f2t,f1t; p2w.
+</pre>
+                In this model the C-code section is empty.  Also, certain local states are
+                followed by a period instead of a semicolon.  This is to indicate that they are legal
+                end states.  When Lurch searches for a deadlock (as in this model, which represents the
+                dining philosophers problem for two philosophers sharing two forks), Lurch
+                must know, for each machine, which of its local states are legal end states.  If Lurch
+                reaches the end of a path and one or more machines is not in a legal end state, a deadlock
+                is reported.  This model also shows how transition columns 2 and 3, the input and output
+                columns, may refer not just to the C-code section but also to other finite-state
+                machines.  A transition which includes, as an input condition, a state from some other
+                machine, can only be executed if that machine is in that state.  And if a transition with
+                a state from another machine in its output column is executed, it sets that machine
+                to that state as a side effect.  For example, the transition <tt>p2w; f2t; f2p; p2l;</tt>
+                can proceed if its machine is in state <tt>p2w</tt> and the second machine is in state
+                <tt>f2t</tt> (philosopher two is waiting and fork two is on the table).
+                If it does proceed it sets the second machine to state <tt>f2p</tt> and
+                sets its own machine to state <tt>p2l</tt> (fork two is in the hand of the previous philosopher,
+                i.e., philosopher two, and philosopher two has a fork in his left hand).
+
+                <br /><br />
+                In addition to using periods vs. semicolons to mark legal end states,
+                there are a few other special marks recognized by Lurch in finite-state machine definitions:
+
+                <br /><br />
+                <TABLE WIDTH="100%" BORDER="0" CELLSPACING="1" CELLPADDING="5">
+                <TR><TD VALIGN="TOP" WIDTH="20%"><tt>_fault</tt></TD><TD>
+                Local states beginning with an underscore are considered faults. For example, a transition
+                representing an assertion violation would lead to a fault state; if Lurch found a path to
+                the violation this transition would be executed, and when the fault state was reached it
+                would be reported. 
+                </TD></TR>
+                <TR><TD VALIGN="TOP" WIDTH="20%"><tt>#progress</tt></TD><TD>
+                The SPIN model checker is capable of finding "no-progress" cycles present in a system.
+                These are global state cycles in which no local state marked as representing progress is
+                reached.  Lurch can also find these cycles, and when doing so assumes that any local
+                state beginning with a pound sign represents progress (note: in older version of Lurch, progress
+                states were marked with a plus sign, but this caused problems for the parser in the current
+                protype GUI version).
+                </TD></TR>
+                <TR><TD VALIGN="TOP" WIDTH="20%"><tt>=accept</tt></TD><TD>
+                The SPIN model checker uses B&uuml;chi automata to represent negated temporal logic properties
+                in "never" clauses.  By definition, a B&uuml;chi automata accepts an input that causes it to
+                continue in a cycle that includes an accept state (as opposed to a normal finite-state machine,
+                which accepts an input that causes it to stop in its accept state).  In order to find acceptance
+                cycles, Lurch needs to know which states in a machine representing a B&uuml;chi automaton are
+                accept states; their names must begin with an equals sign.
+                </TD></TR></TR></TABLE>
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 30, 2006</em>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td id="bottom-left"></td>
+        <td id="bottom">
+          <a href="#models">Input Models</a>
+          <a href="#philosophers">Dining Philosophers</a>
+          <a href="index.html">Lurch</a>
+          <a href="https://home.messiah.edu/~owen/">Home</a>
+        </td>
+      </tr>
+
+    </table>
+
+  </body>
+</html>

@@ -1,0 +1,313 @@
+<html>
+  <head>
+    <title>Temporal Logic Properties</title>
+    <link rel="stylesheet" type="text/css" href="all-slides.css" />
+    <link rel="stylesheet" type="text/css" href="green-slides.css" />
+  </head>
+  <body>
+    <div id="top">
+      <div id="top-title">
+        Temporal Logic Properties
+      </div>
+    </div>
+
+    <table cellspacing="0" cellpadding="0" id="mainTable">
+      <tr>
+        <td id="left">
+          <a href="#background">Background</a><br />
+          <a href="#invariance">Invariance</a><br />
+          <a href="#guarantee">Guarantee</a><br />
+          <a href="#response">Response</a><br />
+          <a href="#precedence">Precedence</a><br />
+          <a href="#recurrence">Recurrence</a><br />
+          <a href="#stability">Stability</a><br />
+          <a href="#correlation">Correlation</a><br />
+          <a href="index.html">Lurch</a><br />
+          <a href="https://home.messiah.edu/~owen/">Home</a><br />
+        </td>
+        <td id="main" colspan="2">
+          <div class="post">
+            <a name="background"></a>
+              <div class="post-title">
+                Background
+              </div>
+            <div class="post-body">
+              <div>
+                B&uuml;chi automata are used to represent temporal logic formulas.  B&uuml;chi automata are different
+                from normal finite-state machines: for normal finite-state machines, acceptance is defined
+                as reaching an accept (or final) state.  For B&uuml;chi automata, acceptance is defined as
+                finding a cycle that includes an accept state; it must be possible to reach the accept
+                state infinitely often.
+                <br /><br />
+                As with the model checker SPIN, for example, Lurch uses B&uuml;chi automata representing
+                the negation of the desired property.  So for the examples on this page, the property
+                given is violated by an execution in which the machine gets stuck in a cycle that includes
+                an accept state.  Note that Lurch, since it's an approximate search with a depth limit,
+                can't tell for sure if we're really stuck in an accept cycle.  So the "hash collisions"
+                parameter is used as a sort of cycle-detection threshold:  if we've seen the same global
+                state n times, where n is the hash collision limit, it's assumed that we're stuck in
+                that cycle and we'd see that state an infinite number of times if the search continued
+                on to infinite depth (this is Lurch's very informal, randomized notion of fairness).
+                <br /><br />
+                Lurch handles temporal logic properties the same way the model checker SPIN does.
+                In fact the underlying program used to translate properties is "ltl2ba", which was written
+                for SPIN.  And the example properties on this page come from SPIN's online documentation
+                (<a href="http://spinroot.com/spin/Doc/fm2003-spin-tutorial.pdf">spinroot.com/spin/Doc/fm2003-spin-tutorial.pdf</a>).
+                To use ltl2ba with Lurch, download the source from
+                <a href="http://spinroot.com/spin/Src/ltl2ba.tar.gz">spinroot.com/spin/Src/ltl2ba.tar.gz</a>.
+                (Note:  I had to modify the ltl2ba files to compile them locally, so I've included the
+                version that worked for me in the Lurch download.)
+                Then compile ltl2ba and run the executable with the script <tt>ba2lu.awk</tt>,
+                included with the Lurch download:
+<pre>
+$ ./ltl2ba -d -f '[]p' | gawk -f 'ba2lu.awk'
+</pre>
+                The output is a little bit criptic.  Here's what you get from the above command:
+<pre>
+n: init. (p); -; init.
+=init
+#define p
+</pre>
+                Lines beginning with <tt>n:</tt> are the B&uuml;chi automaton, which is to be copied
+                directly into the input model.  If the B&uuml;chi automaton ends with <tt>=init</tt>,
+                this means the initial state needs to be an accept state, so an equals sign should
+                be added to every <tt>init</tt> in the B&uuml;chi automaton.  Finally, any <tt>#define</tt>
+                lines needed to be filled out with macro definitions and copied to the beginning of
+                the input model.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Friday, September 22, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="invariance"></a>
+              <div class="post-title">
+                Invariance
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+[]p
+</PRE>
+                "Always <code>p</code>" <br /><br />
+                <span style="font-style:italic;font-size:90%;">Note that the B&uuml;chi automaton shown here represents a violation of this property, i.e., <code>![]p</code>.</span><BR>
+<PRE>
+n: init. (1); -; init.
+n: init. (!p); -; =accept_0.
+n: =accept_0. (1); -; =accept_0.
+</PRE>
+                <IMG SRC="images/invariance.gif"><BR><BR>
+                For these automata, if it's possible to get to an accept cycle, the property's violated,
+                so while they are nondeterministic and include the lambda transition, in effect the transition
+                toward the accept state is preferred. Here, if we ever see <CODE>!p</CODE>, we
+                go to the accept state, and since it's got a lambda transition back to itself,
+                we're automatically in an accept cycle (note: if the machine blocks, i.e., it gets into
+                a state from which no transition is enabled, it is reset back to its initial state; this is
+                to imitate the behavior of a <I>never</I> clause, SPIN's representation of a B&uuml;chi automaton).
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="guarantee"></a>
+              <div class="post-title">
+                Guarantee
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+<>p
+</PRE>
+                "Eventually <code>p</code>"
+<PRE>
+n: =init. (!p); -; =init.
+</PRE>
+                <IMG SRC="images/guarantee.gif"><BR><BR>
+                We go immediately to an accept state, but we must keep seeing <CODE>!p</CODE>
+                forever to stay in the accept cycle.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="response"></a>
+              <div class="post-title">
+                Response
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+p -> <>q
+</PRE>
+                "<code>p</code> implies eventually <code>q</code>"<BR>
+<PRE>
+n: =init. (p & !q); -; =accept_2.
+n: =accept_2. (!q); -; =accept_2.
+</PRE>
+                <IMG SRC="images/response.gif"><BR><BR>
+                From the initial state, if we ever see <CODE>p</CODE> but not <code>q</code>,
+                we go to an accept state, at this point in
+                the same situation as with "guarantee" above.
+                So this is how implication works:  at whatever point the left side is satisfied, we
+                start there and try to satisfy the right side.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="precedence"></a>
+              <div class="post-title">
+                Precedence
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+p -> (q U r)
+</PRE>
+                "<code>p</code> implies <code>q</code> until <code>r</code>"<BR>
+<PRE>
+n: =init. (p & !r); -; =accept_2.
+n: =init. (p & !r & !q); -; =accept_0.
+n: =accept_2. (!r); -; =accept_2.
+n: =accept_2. (!r & !q); -; =accept_0.
+n: =accept_0. (1); -; =accept_0.
+</PRE>
+                <IMG SRC="images/precedence.gif"><BR><BR>
+                What executions are ok?  First, if we never see <CODE>p</CODE>, the property is vacuously true;
+                second, if we see <CODE>p</CODE> and <CODE>r</CODE> but not necessarily <CODE>q</CODE>;
+                third, if we see <CODE>p</CODE> and <CODE>q</CODE>, continue
+                to see <CODE>q</CODE>, and then at some point see <CODE>r</CODE>.
+                What executions are not allowed?  Any in which we
+                see <CODE>p</CODE> but never <CODE>r</CODE> afterward, and any in which <CODE>q</CODE>
+                is not continuously true from the
+                time <CODE>p</CODE> is seen to the time <CODE>r</CODE> is seen.
+                Note: this is "strong until" because the property
+                is violated if we never see <CODE>r</CODE>; if we used "weak until" it would
+                be ok if <CODE>q</CODE> continued forever.
+                Although the syntax used by Lurch (really, the syntax
+                used by ltl2ba underneath) doesn't include a weak until operator, it is possible to use
+                <CODE>[]q | (q U r)</CODE>, which is equivalent to weak until.<br />
+                <br />
+                (LTL2Buchi, an alternative to ltl2ba that includes the weak until operator, is
+                available with NASA Ames' Java Pathfinder at <a href="http://javapathfinder.sourceforge.net/">javapathfinder.sourceforge.net</a>.)
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, September 13, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="recurrence"></a>
+              <div class="post-title">
+                Recurrence
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+[]<>p
+</PRE>
+                "Always eventually <code>p</code>"<BR>
+<PRE>
+n: init. (1); -; init.
+n: init. (!p); -; =accept_2.
+n: =accept_2. (!p); -; =accept_2.
+</PRE>
+                <IMG SRC="images/recurrence.gif"><BR><BR>
+                This property could also be called "progress".  The idea is, from any point in execution,
+                we want to make sure that we will still see <CODE>p</CODE>
+                some time in the future.  There should be
+                no point from which we are no longer guaranteed to see <CODE>p</CODE> in the future.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="stability"></a>
+              <div class="post-title">
+                Stability
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+<>[]p
+</PRE>
+                "Eventually always <code>p</code>"<BR>
+<PRE>
+n: init. (!p); -; =accept_1.
+n: init. (1); -; init.
+n: =accept_1. (!p); -; =accept_1.
+n: =accept_1. (1); -; init.
+</PRE>
+                <IMG SRC="images/stability.gif"><BR><BR>
+                Benjamin Franklin wrote:  "... everything appears to promise that it will
+                last; but in this world nothing is certain but death and taxes."  Taxes are
+                certain in the sense of the previous property, recurrence.  Death is certain
+                in the sense of this property, stability:  all executions (no pun intended)
+                lead to a point at which <CODE>p</CODE> remains true forever.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, September 13, 2006</em>
+            </div>
+          </div>
+          <div class="post">
+            <a name="correlation"></a>
+              <div class="post-title">
+                Correlation
+              </div>
+            <div class="post-body">
+              <div>
+<PRE>
+<>p -> <>q
+</PRE>
+                "Eventually <code>p</code> implies eventually <code>q</code>"<BR>
+<PRE>
+n: init. (!q); -; init.
+n: init. (p & !q); -; =accept_2.
+n: =accept_2. (!q); -; =accept_2.
+</PRE>
+                <IMG SRC="images/correlation.gif"><BR><BR>
+                If we ever see <CODE>p</CODE>, we will see <CODE>q</CODE> sometime after that.
+                Note that the implication doesn't
+                work the other way.  It's possible to read the property as:  if I know that <CODE>p</CODE>
+                is coming some time in the future, then I need to make sure <CODE>q</CODE>
+                also is coming some time in the future,
+                but it doesn't matter which is first...  Here it does matter, <CODE>p</CODE>
+                has to come first, because of what we said about implication above.
+              </div>
+            </div>
+            <div class="post-footer">
+              <em>Updated Wednesday, March 29, 2006</em>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td id="bottom-left"></td>
+        <td id="bottom">
+          <a href="#background">Background</a>
+          <a href="#invariance">Invariance</a>
+          <a href="#guarantee">Guarantee</a>
+          <a href="#response">Response</a>
+          <a href="#precedence">Precedence</a>
+          <a href="#recurrence">Recurrence</a>
+          <a href="#stability">Stability</a>
+          <a href="#correlation">Correlation</a>
+          <a href="index.html">Lurch</a>
+          <a href="https://home.messiah.edu/~owen/">Home</a>
+        </td>
+      </tr>
+
+    </table>
+
+  </body>
+</html>

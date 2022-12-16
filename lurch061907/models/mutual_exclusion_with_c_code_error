@@ -1,0 +1,35 @@
+#define FALSE 0
+#define TRUE 1 
+
+enum { Aturn, Bturn } t = Bturn;
+int x = TRUE, y = TRUE;
+
+void _before()
+{
+  t = Bturn;
+  x = y = TRUE;
+}
+
+%%
+
+a1;     -;            {x = TRUE;};  a2;
+a2;     -;            {t = Bturn;}; a3;
+a3;     (!y);         -;            acs;
+a3;     (t == Aturn); -;            acs;
+acs;    -;            {x = FALSE;}; a5.
+
+b1;     -;            {y = TRUE;};  b2;
+b2;     -;            {t = Aturn;}; b3;
+b3;     -;            -;            bcs;
+b3;     (t == Bturn); -;            bcs;
+bcs;    -;            {y = FALSE;}; b5.
+
+ok. acs,bcs; -; _error.
+
+
+
+
+
+
+
+

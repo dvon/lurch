@@ -1,0 +1,104 @@
+
+%%
+
+f1t.
+f1p;
+f1n;
+
+f2t.
+f2p;
+f2n;
+
+f3t.
+f3p;
+f3n;
+
+f4t.
+f4p;
+f4n;
+
+f5t.
+f5p;
+f5n;
+
+f6t.
+f6p;
+f6n;
+
+f7t.
+f7p;
+f7n;
+
+f8t.
+f8p;
+f8n;
+
+f9t.
+f9p;
+f9n;
+
+f10t.
+f10p;
+f10n;
+
+p1w; f1t; f1p; p1l;
+p1w; f10t; f10n; p1r;
+p1l; f10t; f10n; p1e;
+p1r; f1t; f1p; p1e;
+p1e; -; f1t,f10t; p1f.
+
+p2w; f2t; f2p; p2l;
+p2w; f1t; f1n; p2r;
+p2l; f1t; f1n; p2e;
+p2r; f2t; f2p; p2e;
+p2e; -; f2t,f1t; p2f.
+
+p3w; f3t; f3p; p3l;
+p3w; f2t; f2n; p3r;
+p3l; f2t; f2n; p3e;
+p3r; f3t; f3p; p3e;
+p3e; -; f3t,f2t; p3f.
+
+p4w; f4t; f4p; p4l;
+p4w; f3t; f3n; p4r;
+p4l; f3t; f3n; p4e;
+p4r; f4t; f4p; p4e;
+p4e; -; f4t,f3t; p4f.
+
+p5w; f5t; f5p; p5l;
+p5w; f4t; f4n; p5r;
+p5l; f4t; f4n; p5e;
+p5r; f5t; f5p; p5e;
+p5e; -; f5t,f4t; p5f.
+
+p6w; f6t; f6p; p6l;
+p6w; f5t; f5n; p6r;
+p6l; f5t; f5n; p6e;
+p6r; f6t; f6p; p6e;
+p6e; -; f6t,f5t; p6f.
+
+p7w; f7t; f7p; p7l;
+p7w; f6t; f6n; p7r;
+p7l; f6t; f6n; p7e;
+p7r; f7t; f7p; p7e;
+p7e; -; f7t,f6t; p7f.
+
+p8w; f8t; f8p; p8l;
+p8w; f7t; f7n; p8r;
+p8l; f7t; f7n; p8e;
+p8r; f8t; f8p; p8e;
+p8e; -; f8t,f7t; p8f.
+
+p9w; f9t; f9p; p9l;
+p9w; f8t; f8n; p9r;
+p9l; f8t; f8n; p9e;
+p9r; f9t; f9p; p9e;
+p9e; -; f9t,f8t; p9f.
+
+p10w; f10t; f10p; p10l;
+p10w; f9t; f9n; p10r;
+p10l; f9t; f9n; p10e;
+p10r; f10t; f10p; p10e;
+p10e; -; f10t,f9t; p10f.
+
+

@@ -1,0 +1,64 @@
+int lk = 0, r_want = 0, r_lock = 0, sleep_q = 0;
+enum { Wakeme, Running } State = Running;
+
+void _before()
+{
+  lk = r_want = r_lock = sleep_q = 0;
+  State = Running;
+}
+
+void _hash(unsigned int *h)
+{
+  _hash_int(lk, h);
+  _hash_int(r_want, h);
+  _hash_int(r_lock, h);
+  _hash_int(sleep_q, h);
+  _hash_int(State, h);
+}
+
+void _print(char *tmp)
+{
+  sprintf(tmp, "   lk = %i\n", lk);
+  sprintf(&tmp[strlen(tmp)], "   r_want = %i\n", r_want);
+  sprintf(&tmp[strlen(tmp)], "   r_lock = %i\n", r_lock);
+  sprintf(&tmp[strlen(tmp)], "   sleep_q = %i\n", sleep_q);
+
+  State == Wakeme ?
+    sprintf(&tmp[strlen(tmp)], "   State = Wakeme\n") :
+    sprintf(&tmp[strlen(tmp)], "   State = Running\n");
+}
+
+%%
+
+c3;   (lk == 0);          {lk = 1;};                       c11;
+c5;   -;                  {r_want = 1;};                   c6;
+c6;   -;                  {State = Wakeme;};               c7;
+c7;   -;                  {lk = 0;};                       c8;
+c8;   (State == Running); -;                               c3;
+c11;  (r_lock == 1);      -;                               c5;
+c11;  (r_lock == 0);      -;                               c14;
+c14;  (r_lock == 0);      #progress;                       c15;
+c14;  (r_lock != 0);      #progress,_c14_assert_violated;  c15;
+c15;  -;                  {r_lock = 1;};                   c16;
+c16;  -;                  {lk = 0;};                       c3;
+
+s1;  -;                 {r_lock = 0;};      s2;
+s2;  (lk == 0);         -;                  s15;
+s6;  (sleep_q == 0);    {sleep_q = 1;};     s7;
+s7;  -;                 {r_want = 0;};      s11;
+s9;  -;                 {State = Running;}; s13;
+s11; (State == Wakeme); -;                  s9;
+s11; (State != Wakeme); -;                  s13;
+s13; -;                 {sleep_q = 0;};     s1;
+s15; (r_want == 1);     -;                  s6;
+s15; (r_want != 1);     -;                  s1;
+
+no_progress;
+#progress; -; -; no_progress;
+
+
+
+
+
+
+

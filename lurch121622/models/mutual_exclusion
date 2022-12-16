@@ -1,0 +1,31 @@
+
+%%
+
+Bturn;
+Aturn;
+
+x;
+!x;
+
+y;
+!y;
+
+a1;  -;     x;     a2;
+a2;  -;     Bturn; a3;
+a3;  !y;    -;     acs;
+a3;  Aturn; -;     acs;
+acs; -;     !x;    a5.
+
+b1;  -;     y;     b2;
+b2;  -;     Aturn; b3;
+b3;  !x;    -;     bcs;
+b3;  Bturn; -;     bcs;
+bcs; -;     !y;    b5.
+
+ok. acs,bcs; -; _error.
+
+
+
+
+
+
